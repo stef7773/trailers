@@ -1,19 +1,20 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
     <title>Educare AI</title>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const videoId = urlParams.get('id');
+        const params = new URLSearchParams(window.location.search);
+        const videoId = params.get('id');
 
         if (videoId) {
-            // 1. Intentar abrir directo en la app via intent Android
-            const appIntent = "intent://trailers/video?id=" + videoId +
-                "#Intent;scheme=https;package=com.educareai.app;" +
-                "S.browser_fallback_url=https://stef7773.github.io/trailers/video?id=" + videoId +
+            // En Android abre tu app directamente
+            window.location.href =
+                "intent://trailers/video?id=" + videoId +
+                "#Intent;scheme=https;host=stef7773.github.io;" +
+                "package=com.educareai.app;" +
+                "S.browser_fallback_url=https://www.youtube.com/watch?v=" + videoId +
                 ";end";
-
-            window.location.href = appIntent;
         } else {
             window.location.replace("https://m.youtube.com");
         }
