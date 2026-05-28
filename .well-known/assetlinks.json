@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.educareai.app",
+    "sha256_cert_fingerprints": ["84:1e:76:3c:3f:9a:d1:6b:b8:54:9c:47:ae:a9:31:2b:00:34:97:b0:bc:1e:f7:1e:8a:71:3a:e0:46:d4:43:a1 "]
+  }
+}]
