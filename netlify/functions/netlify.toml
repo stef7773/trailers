@@ -1,0 +1,5 @@
+[[redirects]]
+  from = "/video"
+  to = "/.netlify/functions/video"
+  status = 200
+  force = true
