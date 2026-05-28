@@ -5,14 +5,21 @@
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const videoId = urlParams.get('id');
+
         if (videoId) {
-            window.location.replace("https://www.youtube.com/watch?v=" + videoId);
+            // 1. Intentar abrir directo en la app via intent Android
+            const appIntent = "intent://trailers/video?id=" + videoId +
+                "#Intent;scheme=https;package=com.educareai.app;" +
+                "S.browser_fallback_url=https://stef7773.github.io/trailers/video?id=" + videoId +
+                ";end";
+
+            window.location.href = appIntent;
         } else {
             window.location.replace("https://m.youtube.com");
         }
     </script>
 </head>
 <body>
-    <p>Cargando video en Educare AI...</p>
+    <p>Abriendo en Educare AI...</p>
 </body>
 </html>
