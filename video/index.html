@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Educare AI</title>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const videoId = urlParams.get('id');
+        if (videoId) {
+            window.location.replace("https://www.youtube.com/watch?v=" + videoId);
+        } else {
+            window.location.replace("https://m.youtube.com");
+        }
+    </script>
+</head>
+<body>
+    <p>Cargando video en Educare AI...</p>
+</body>
+</html>
