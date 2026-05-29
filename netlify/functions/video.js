@@ -13,10 +13,7 @@ exports.handler = async function(event) {
     const desc      = "Toca para ver el video en la app Educare AI";
     const url       = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
     const playStore = `https://play.google.com/store/apps/details?id=com.educareai.app&hl=es_419`;
-    
-    // Usar esquema personalizado para evitar bucle
-    const customScheme = `educareai://video?id=${videoId}`;
-    const intentUrl = `intent://video?id=${videoId}#Intent;scheme=educareai;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
+    const intentUrl = `intent://video?id=${videoId}#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
 
     const html = `<!DOCTYPE html>
 <html>
@@ -86,18 +83,6 @@ exports.handler = async function(event) {
         }
         .btn-app   { background: #ff0000; color: white; }
         .btn-store { background: #01875f; color: white; }
-        
-        .debug {
-            margin-top: 20px;
-            padding: 10px;
-            background: #1a1a1a;
-            border-radius: 8px;
-            font-size: 11px;
-            color: #0f0;
-            font-family: monospace;
-            text-align: left;
-            word-break: break-all;
-        }
     </style>
 </head>
 <body>
@@ -112,48 +97,16 @@ exports.handler = async function(event) {
             📲 Descargar Educare AI
         </a>
     </div>
-    <div class="debug" id="debugInfo">
-        Estado: Iniciando...<br>
-        Intent URL: ${intentUrl}<br>
-    </div>
     <script>
-        var debugDiv = document.getElementById('debugInfo');
-        var appOpened = false;
-        
-        function log(msg) {
-            debugDiv.innerHTML += msg + '<br>';
-            console.log(msg);
-        }
-        
-        log('Script iniciado - Video ID: ${videoId}');
-        
-        // SOLO intentar abrir automáticamente UNA vez
-        log('Intentando abrir app automáticamente...');
-        window.location.href = "${intentUrl}";
-        log('Redirección ejecutada');
-        
-        // Detectar si la app se abrió
-        window.addEventListener('blur', function() {
-            if (!appOpened) {
-                appOpened = true;
-                log('✅ App abierta correctamente');
-            }
-        });
-        
-        window.addEventListener('pagehide', function() {
-            if (!appOpened) {
-                appOpened = true;
-                log('✅ App abierta correctamente');
-            }
-        });
-        
-        // Timeout para informar
-        setTimeout(function() {
-            if (!appOpened) {
-                log('⚠️ La app no se abrió automáticamente');
-                log('💡 Toca el botón ROJO manualmente');
-            }
+        var timeout = setTimeout(function() {
+            document.getElementById('btnApp').style.display = 'none';
         }, 2000);
+
+        window.location.href = "${intentUrl}";
+
+        window.addEventListener('blur', function() {
+            clearTimeout(timeout);
+        });
     </script>
 </body>
 </html>`;
