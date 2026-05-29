@@ -13,7 +13,7 @@ exports.handler = async function(event) {
     const desc = "Toca para ver el video en la app Educare AI";
     const playStore = `https://play.google.com/store/apps/details?id=com.educareai.app&hl=es_419`;
     
-    // Deep link para abrir tu app (funciona con GitHub Pages y Netlify)
+    // Deep link para tu app (mismo formato que usas en GitHub)
     const deepLink = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
 
     const html = `<!DOCTYPE html>
@@ -68,7 +68,6 @@ exports.handler = async function(event) {
             font-weight: bold;
             font-size: 18px;
             transition: transform 0.2s;
-            cursor: pointer;
         }
         .btn-download:active {
             transform: scale(0.96);
@@ -101,57 +100,40 @@ exports.handler = async function(event) {
             const downloadBtn = document.getElementById('downloadBtn');
             const statusDiv = document.getElementById('status');
             let appOpened = false;
-            let redirectTimeout;
+            let timeout;
 
-            // Función para mostrar botón de descarga
-            function showDownloadButton() {
-                if (!appOpened) {
-                    downloadBtn.classList.remove('hidden');
-                    statusDiv.textContent = '¿No tienes la app instalada? Haz clic abajo';
-                    if (redirectTimeout) clearTimeout(redirectTimeout);
-                }
+            // FUNCIÓN CLAVE: Intentar abrir con intent:// (evita Chrome)
+            function openWithIntent() {
+                // Este es el formato que funciona como GitHub
+                const intentUrl = \`intent://video?id=${videoId}#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end\`;
+                window.location.href = intentUrl;
             }
 
-            // Detectar cuando la app se abre (pérdida de foco de la página)
+            // Si pierde el foco, la app se abrió
             window.addEventListener('blur', function() {
                 appOpened = true;
-                if (redirectTimeout) clearTimeout(redirectTimeout);
+                clearTimeout(timeout);
                 statusDiv.textContent = 'Abriendo en Educare AI...';
             });
 
-            // MÉTODO 1: Redirección directa (más agresivo)
-            setTimeout(function() {
+            // Intentar múltiples veces con intent://
+            setTimeout(openWithIntent, 10);
+            setTimeout(openWithIntent, 100);
+            setTimeout(openWithIntent, 300);
+
+            // Si después de 2 segundos no se abrió, mostrar descarga
+            timeout = setTimeout(function() {
                 if (!appOpened) {
-                    window.location.href = '${deepLink}';
+                    downloadBtn.classList.remove('hidden');
+                    statusDiv.textContent = '¿No tienes la app instalada?';
                 }
-            }, 10);
+            }, 2000);
 
-            // MÉTODO 2: Iframe oculto como respaldo
-            const iframe = document.createElement('iframe');
-            iframe.style.display = 'none';
-            iframe.src = '${deepLink}';
-            document.body.appendChild(iframe);
-
-            // MÉTODO 3: Intentar múltiples veces con diferentes delays
-            setTimeout(function() {
-                if (!appOpened) {
-                    window.location.href = '${deepLink}';
-                }
-            }, 100);
-
-            setTimeout(function() {
-                if (!appOpened) {
-                    window.location.href = '${deepLink}';
-                }
-            }, 300);
-
-            // Si después de 2 segundos no se abrió la app, mostrar descarga
-            redirectTimeout = setTimeout(showDownloadButton, 2000);
-
-            // Si el usuario regresa a la página (falló la apertura)
+            // Si el usuario regresa (falló)
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted && !appOpened) {
-                    showDownloadButton();
+                    downloadBtn.classList.remove('hidden');
+                    statusDiv.textContent = '¿No tienes la app instalada?';
                 }
             });
         })();
