@@ -93,6 +93,7 @@ exports.handler = async function(event) {
             font-size: 12px;
             color: #0f0;
             font-family: monospace;
+            word-break: break-all;
         }
     </style>
 </head>
@@ -104,45 +105,92 @@ exports.handler = async function(event) {
         <a class="btn btn-app" id="btnApp" href="${intentUrl}">
             🎬 Abrir en Educare AI
         </a>
-        <a class="btn btn-store" href="${playStore}">
+        <a class="btn btn-store" id="btnStore" href="${playStore}">
             📲 Descargar Educare AI
         </a>
     </div>
     <div class="debug" id="debugInfo">
-        Intentando abrir: ${intentUrl}<br>
-        Estado: Iniciando...
+        Intentando abrir app automáticamente...<br>
     </div>
     <script>
         var debugDiv = document.getElementById('debugInfo');
         var btnApp = document.getElementById('btnApp');
+        var btnStore = document.getElementById('btnStore');
+        var appOpened = false;
         var timeout;
         
-        debugDiv.innerHTML += '<br>Script iniciado - Intentando abrir app automáticamente...';
+        function addDebug(msg) {
+            debugDiv.innerHTML += msg + '<br>';
+            console.log(msg);
+        }
         
-        // Intentar abrir automáticamente
-        window.location.href = "${intentUrl}";
-        debugDiv.innerHTML += '<br>Redirección ejecutada a: ${intentUrl}';
+        addDebug('Script iniciado - Video ID: ${videoId}');
+        addDebug('Intent URL: ${intentUrl.substring(0, 100)}...');
         
-        // Timeout para ocultar botón rojo si no se abre la app
-        timeout = setTimeout(function() {
-            debugDiv.innerHTML += '<br>TIMEOUT: No se detectó apertura de app (2 segundos)';
-            debugDiv.innerHTML += '<br>Ocultando botón rojo...';
-            btnApp.style.display = 'none';
-            debugDiv.innerHTML += '<br>Botón rojo ocultado. Solo visible botón verde.';
-        }, 2000);
+        // Múltiples métodos para detectar que la app se abrió
         
-        // Detectar si la app se abrió (pérdida de foco)
+        // 1. Evento blur (pérdida de foco)
         window.addEventListener('blur', function() {
-            debugDiv.innerHTML += '<br>EVENTO blur: La página perdió foco - la app se abrió!';
-            clearTimeout(timeout);
-            debugDiv.innerHTML += '<br>Timeout cancelado. Botón rojo permanece visible.';
+            if (!appOpened) {
+                appOpened = true;
+                addDebug('✅ blur detectado - La app se abrió!');
+                clearTimeout(timeout);
+            }
         });
         
-        // Log cuando la página carga completamente
-        window.addEventListener('load', function() {
-            debugDiv.innerHTML += '<br>Página completamente cargada.';
-            debugDiv.innerHTML += '<br>Intent URL: ${intentUrl}';
+        // 2. Evento pagehide (página oculta)
+        window.addEventListener('pagehide', function() {
+            if (!appOpened) {
+                appOpened = true;
+                addDebug('✅ pagehide detectado - La app se abrió!');
+                clearTimeout(timeout);
+            }
         });
+        
+        // 3. Evento visibilitychange (pestaña oculta)
+        document.addEventListener('visibilitychange', function() {
+            if (document.hidden && !appOpened) {
+                appOpened = true;
+                addDebug('✅ visibilitychange - Pestaña oculta, app abierta!');
+                clearTimeout(timeout);
+            }
+        });
+        
+        // Intentar abrir la app con múltiples métodos
+        addDebug('Intentando abrir con window.location...');
+        window.location.href = "${intentUrl}";
+        
+        // También intentar con iframe silencioso
+        var iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = "${intentUrl}";
+        document.body.appendChild(iframe);
+        addDebug('Iframe creado para intent adicional');
+        
+        // Timeout: si después de 3 segundos no se detectó apertura
+        timeout = setTimeout(function() {
+            if (!appOpened) {
+                addDebug('❌ TIMEOUT (3 segundos) - No se detectó apertura');
+                addDebug('La app NO está instalada o hubo un error');
+                addDebug('Ocultando botón rojo, mostrando solo botón verde');
+                btnApp.style.display = 'none';
+                addDebug('✅ Solo botón verde visible para descarga');
+            } else {
+                addDebug('App abierta correctamente, ambos botones visibles');
+            }
+        }, 3000);
+        
+        // Si el usuario regresa a la página (solo si falló)
+        window.addEventListener('pageshow', function(event) {
+            addDebug('pageshow event - persisted: ' + event.persisted);
+            if (event.persisted && !appOpened) {
+                addDebug('⚠️ Usuario regresó a la página - la app no se abrió');
+                btnApp.style.display = 'none';
+                addDebug('Botón rojo ocultado');
+            }
+        });
+        
+        addDebug('Esperando detección de apertura de app...');
     </script>
 </body>
 </html>`;
