@@ -19,7 +19,7 @@ exports.handler = async function(event) {
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>${title}</title>
     <meta property="og:type"         content="video.other">
     <meta property="og:title"        content="${title}">
@@ -33,46 +33,50 @@ exports.handler = async function(event) {
     <meta name="twitter:image"       content="${thumb}">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { font-size: 16px; }
         body {
-            font-family: sans-serif;
+            font-family: -apple-system, sans-serif;
             text-align: center;
-            padding: 30px 20px;
+            padding: 24px 16px;
             background: #0f0f0f;
             color: white;
             min-height: 100vh;
+            width: 100%;
         }
         h2 {
-            font-size: 22px;
-            margin-bottom: 20px;
+            font-size: 5vw;
+            min-font-size: 20px;
+            margin-bottom: 16px;
             line-height: 1.3;
+            padding: 0 8px;
         }
         img {
-            width: 100%;
-            max-width: 500px;
-            border-radius: 16px;
-            margin: 0 auto 24px;
+            width: 92vw;
+            max-width: 92vw;
+            border-radius: 12px;
+            margin: 0 auto 20px;
             display: block;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5);
         }
         p {
-            font-size: 16px;
+            font-size: 4vw;
             color: #aaa;
-            margin-bottom: 32px;
+            margin-bottom: 28px;
+            padding: 0 8px;
         }
         .botones {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 400px;
+            gap: 14px;
+            width: 92vw;
             margin: 0 auto;
-            padding: 0 10px;
         }
         .btn {
             display: block;
             width: 100%;
-            padding: 18px 28px;
+            padding: 5vw 0;
             border-radius: 50px;
-            font-size: 18px;
+            font-size: 5vw;
             font-weight: bold;
             text-decoration: none;
             letter-spacing: 0.5px;
