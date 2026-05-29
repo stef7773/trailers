@@ -18,16 +18,16 @@ exports.handler = async function(event) {
 <head>
     <meta charset="utf-8">
     <title>${title}</title>
-    <meta property="og:type"        content="video.other">
-    <meta property="og:title"       content="${title}">
-    <meta property="og:description" content="${desc}">
-    <meta property="og:image"       content="${thumb}">
-    <meta property="og:image:width" content="1280">
-    <meta property="og:image:height"content="720">
-    <meta property="og:url"         content="${url}">
-    <meta name="twitter:card"       content="summary_large_image">
-    <meta name="twitter:title"      content="${title}">
-    <meta name="twitter:image"      content="${thumb}">
+    <meta property="og:type"         content="video.other">
+    <meta property="og:title"        content="${title}">
+    <meta property="og:description"  content="${desc}">
+    <meta property="og:image"        content="${thumb}">
+    <meta property="og:image:width"  content="1280">
+    <meta property="og:image:height" content="720">
+    <meta property="og:url"          content="${url}">
+    <meta name="twitter:card"        content="summary_large_image">
+    <meta name="twitter:title"       content="${title}">
+    <meta name="twitter:image"       content="${thumb}">
 </head>
 <body>
     <script>
@@ -35,7 +35,7 @@ exports.handler = async function(event) {
             "intent://video?id=${videoId}" +
             "#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;" +
             "package=com.educareai.app;" +
-            "S.browser_fallback_url=https://www.youtube.com/watch?v=${videoId};end";
+            "S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.educareai.app%26hl%3Des_419;end";
     </script>
     <p>Abriendo en Educare AI...</p>
 </body>
