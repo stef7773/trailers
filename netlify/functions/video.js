@@ -8,16 +8,18 @@ exports.handler = async function(event) {
         };
     }
 
-    const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    const title = "Mira este tráiler en Educare AI 🎬";
-    const desc  = "Toca para ver el video en la app Educare AI";
-    const url   = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
+    const thumb     = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    const title     = "Mira este tráiler en Educare AI 🎬";
+    const desc      = "Toca para ver el video en la app Educare AI";
+    const url       = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
     const playStore = `https://play.google.com/store/apps/details?id=com.educareai.app&hl=es_419`;
+    const intentUrl = `intent://video?id=${videoId}#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
 
     const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${title}</title>
     <meta property="og:type"         content="video.other">
     <meta property="og:title"        content="${title}">
@@ -30,10 +32,52 @@ exports.handler = async function(event) {
     <meta name="twitter:title"       content="${title}">
     <meta name="twitter:image"       content="${thumb}">
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 40px 20px; background: #0f0f0f; color: white; }
-        img { width: 100%; max-width: 400px; border-radius: 12px; margin: 20px auto; display: block; }
-        .btn { display: inline-block; margin: 10px; padding: 14px 28px; border-radius: 24px; font-size: 16px; font-weight: bold; text-decoration: none; }
-        .btn-app { background: #ff0000; color: white; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 30px 20px;
+            background: #0f0f0f;
+            color: white;
+            min-height: 100vh;
+        }
+        h2 {
+            font-size: 22px;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+        img {
+            width: 100%;
+            max-width: 500px;
+            border-radius: 16px;
+            margin: 0 auto 24px;
+            display: block;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+        p {
+            font-size: 16px;
+            color: #aaa;
+            margin-bottom: 32px;
+        }
+        .botones {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 0 10px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 18px 28px;
+            border-radius: 50px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            letter-spacing: 0.5px;
+        }
+        .btn-app   { background: #ff0000; color: white; }
         .btn-store { background: #01875f; color: white; }
     </style>
 </head>
@@ -41,24 +85,20 @@ exports.handler = async function(event) {
     <h2>${title}</h2>
     <img src="${thumb}" alt="thumbnail">
     <p>${desc}</p>
-    <a class="btn btn-app"   id="btnApp"   href="intent://video?id=${videoId}#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end">
-        🎬 Abrir en Educare AI
-    </a>
-    <br>
-    <a class="btn btn-store" href="${playStore}">
-        📲 Descargar Educare AI
-    </a>
-
+    <div class="botones">
+        <a class="btn btn-app" id="btnApp" href="${intentUrl}">
+            🎬 Abrir en Educare AI
+        </a>
+        <a class="btn btn-store" href="${playStore}">
+            📲 Descargar Educare AI
+        </a>
+    </div>
     <script>
-        // Intentar abrir la app automáticamente
-        var appUrl = "intent://video?id=${videoId}#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end";
-        
         var timeout = setTimeout(function() {
-            // Si después de 2s no abrió la app → mostrar botones
             document.getElementById('btnApp').style.display = 'none';
         }, 2000);
 
-        window.location.href = appUrl;
+        window.location.href = "${intentUrl}";
 
         window.addEventListener('blur', function() {
             clearTimeout(timeout);
