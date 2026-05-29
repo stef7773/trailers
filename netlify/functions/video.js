@@ -84,15 +84,15 @@ exports.handler = async function(event) {
         .btn-app   { background: #ff0000; color: white; }
         .btn-store { background: #01875f; color: white; }
         
-        /* Para debug - mostrar información de estado */
         .debug {
             margin-top: 20px;
             padding: 10px;
             background: #1a1a1a;
             border-radius: 8px;
-            font-size: 12px;
+            font-size: 11px;
             color: #0f0;
             font-family: monospace;
+            text-align: left;
             word-break: break-all;
         }
     </style>
@@ -105,92 +105,65 @@ exports.handler = async function(event) {
         <a class="btn btn-app" id="btnApp" href="${intentUrl}">
             🎬 Abrir en Educare AI
         </a>
-        <a class="btn btn-store" id="btnStore" href="${playStore}">
+        <a class="btn btn-store" href="${playStore}">
             📲 Descargar Educare AI
         </a>
     </div>
     <div class="debug" id="debugInfo">
-        Intentando abrir app automáticamente...<br>
+        Estado: Iniciando...<br>
     </div>
     <script>
         var debugDiv = document.getElementById('debugInfo');
-        var btnApp = document.getElementById('btnApp');
-        var btnStore = document.getElementById('btnStore');
-        var appOpened = false;
-        var timeout;
         
-        function addDebug(msg) {
+        function log(msg) {
             debugDiv.innerHTML += msg + '<br>';
             console.log(msg);
         }
         
-        addDebug('Script iniciado - Video ID: ${videoId}');
-        addDebug('Intent URL: ${intentUrl.substring(0, 100)}...');
+        log('Script iniciado - Video ID: ${videoId}');
+        log('Intentando abrir app automáticamente...');
+        log('Intent URL: ${intentUrl}');
         
-        // Múltiples métodos para detectar que la app se abrió
+        // Intentar abrir la app automáticamente
+        window.location.href = "${intentUrl}";
+        log('Redirección ejecutada');
         
-        // 1. Evento blur (pérdida de foco)
+        // Detectar si la app se abrió
+        var appOpened = false;
+        
         window.addEventListener('blur', function() {
             if (!appOpened) {
                 appOpened = true;
-                addDebug('✅ blur detectado - La app se abrió!');
-                clearTimeout(timeout);
+                log('✅ EVENTO blur: La app se abrió!');
             }
         });
         
-        // 2. Evento pagehide (página oculta)
         window.addEventListener('pagehide', function() {
             if (!appOpened) {
                 appOpened = true;
-                addDebug('✅ pagehide detectado - La app se abrió!');
-                clearTimeout(timeout);
+                log('✅ EVENTO pagehide: La app se abrió!');
             }
         });
         
-        // 3. Evento visibilitychange (pestaña oculta)
         document.addEventListener('visibilitychange', function() {
             if (document.hidden && !appOpened) {
                 appOpened = true;
-                addDebug('✅ visibilitychange - Pestaña oculta, app abierta!');
-                clearTimeout(timeout);
+                log('✅ EVENTO visibilitychange: La app se abrió!');
             }
         });
         
-        // Intentar abrir la app con múltiples métodos
-        addDebug('Intentando abrir con window.location...');
-        window.location.href = "${intentUrl}";
-        
-        // También intentar con iframe silencioso
-        var iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = "${intentUrl}";
-        document.body.appendChild(iframe);
-        addDebug('Iframe creado para intent adicional');
-        
-        // Timeout: si después de 3 segundos no se detectó apertura
-        timeout = setTimeout(function() {
-            if (!appOpened) {
-                addDebug('❌ TIMEOUT (3 segundos) - No se detectó apertura');
-                addDebug('La app NO está instalada o hubo un error');
-                addDebug('Ocultando botón rojo, mostrando solo botón verde');
-                btnApp.style.display = 'none';
-                addDebug('✅ Solo botón verde visible para descarga');
+        // Timeout solo para informar, sin ocultar botones
+        setTimeout(function() {
+            if (appOpened) {
+                log('✅ Verificación: App abierta correctamente');
             } else {
-                addDebug('App abierta correctamente, ambos botones visibles');
+                log('⚠️ Verificación: No se detectó apertura (probablemente app no instalada)');
+                log('💡 El usuario debe tocar el botón rojo manualmente');
             }
+            log('🔴 Botón ROJO: Abrir en Educare AI');
+            log('🟢 Botón VERDE: Descargar Educare AI');
+            log('✅ Ambos botones permanecen VISIBLES');
         }, 3000);
-        
-        // Si el usuario regresa a la página (solo si falló)
-        window.addEventListener('pageshow', function(event) {
-            addDebug('pageshow event - persisted: ' + event.persisted);
-            if (event.persisted && !appOpened) {
-                addDebug('⚠️ Usuario regresó a la página - la app no se abrió');
-                btnApp.style.display = 'none';
-                addDebug('Botón rojo ocultado');
-            }
-        });
-        
-        addDebug('Esperando detección de apertura de app...');
     </script>
 </body>
 </html>`;
