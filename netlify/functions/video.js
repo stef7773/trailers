@@ -8,139 +8,147 @@ exports.handler = async function(event) {
         };
     }
 
-    const thumb     = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
-    const title     = "Mira este tráiler en Educare AI 🎬";
-    const desc      = "Toca para ver el video en la app Educare AI";
-    const url       = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
+    const thumb = `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+    const title = "Mira este tráiler en Educare AI 🎬";
+    const desc = "Toca para ver el video en la app Educare AI";
     const playStore = `https://play.google.com/store/apps/details?id=com.educareai.app&hl=es_419`;
     
-    // URL DEEP LINK correcta para tu manifest (Netlify)
+    // Deep link para abrir tu app (funciona con GitHub Pages y Netlify)
     const deepLink = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
 
     const html = `<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>${title}</title>
-    <meta property="og:type"         content="video.other">
-    <meta property="og:title"        content="${title}">
-    <meta property="og:description"  content="${desc}">
-    <meta property="og:image"        content="${thumb}">
-    <meta property="og:image:width"  content="1280">
-    <meta property="og:image:height" content="720">
-    <meta property="og:url"          content="${url}">
-    <meta name="twitter:card"        content="summary_large_image">
-    <meta name="twitter:title"       content="${title}">
-    <meta name="twitter:image"       content="${thumb}">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${desc}">
+    <meta property="og:image" content="${thumb}">
+    <meta property="og:url" content="${deepLink}">
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            text-align: center;
-            padding: 24px 16px;
             background: #0f0f0f;
             color: white;
             min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
         }
-        h2 {
-            font-size: clamp(20px, 5vw, 28px);
+        .container {
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
             margin-bottom: 16px;
-            line-height: 1.3;
         }
         img {
-            width: min(92vw, 400px);
+            width: 100%;
             border-radius: 12px;
-            margin: 0 auto 20px;
-            display: block;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
         }
         p {
-            font-size: clamp(14px, 4vw, 18px);
             color: #aaa;
-            margin-bottom: 28px;
+            margin-bottom: 30px;
+            font-size: 16px;
         }
-        .btn-store {
+        .btn-download {
             display: inline-block;
             background: #01875f;
             color: white;
-            padding: clamp(12px, 5vw, 18px) clamp(24px, 8vw, 40px);
+            padding: 14px 32px;
             border-radius: 50px;
-            font-size: clamp(16px, 5vw, 22px);
-            font-weight: bold;
             text-decoration: none;
-            letter-spacing: 0.5px;
-            transition: transform 0.2s, background 0.2s;
+            font-weight: bold;
+            font-size: 18px;
+            transition: transform 0.2s;
+            cursor: pointer;
         }
-        .btn-store:active {
+        .btn-download:active {
             transform: scale(0.96);
-            background: #016544;
         }
         .hidden {
             display: none;
         }
-        .loader {
-            margin-top: 30px;
+        .status {
+            margin-top: 20px;
             font-size: 14px;
             color: #666;
         }
     </style>
 </head>
 <body>
-    <h2>${title}</h2>
-    <img src="${thumb}" alt="thumbnail" loading="eager">
-    <p>${desc}</p>
-    <div>
-        <a class="btn-store hidden" id="downloadBtn" href="${playStore}">
+    <div class="container">
+        <h1>${title}</h1>
+        <img src="${thumb}" alt="Video thumbnail">
+        <p>${desc}</p>
+        <a href="${playStore}" class="btn-download hidden" id="downloadBtn">
             📲 Descargar Educare AI
         </a>
+        <div class="status" id="status">
+            Abriendo Educare AI...
+        </div>
     </div>
-    <div class="loader" id="loader">Abriendo Educare AI...</div>
 
     <script>
         (function() {
-            var downloadBtn = document.getElementById('downloadBtn');
-            var loader = document.getElementById('loader');
-            var appOpened = false;
-            var timeoutId = null;
+            const downloadBtn = document.getElementById('downloadBtn');
+            const statusDiv = document.getElementById('status');
+            let appOpened = false;
+            let redirectTimeout;
 
-            // Función para mostrar el botón de descarga (solo si la app NO está instalada)
+            // Función para mostrar botón de descarga
             function showDownloadButton() {
                 if (!appOpened) {
                     downloadBtn.classList.remove('hidden');
-                    loader.textContent = '¿No tienes la app?';
-                    if (timeoutId) clearTimeout(timeoutId);
+                    statusDiv.textContent = '¿No tienes la app instalada? Haz clic abajo';
+                    if (redirectTimeout) clearTimeout(redirectTimeout);
                 }
             }
 
-            // Detectar cuando la app se abre (pierde foco la página)
+            // Detectar cuando la app se abre (pérdida de foco de la página)
             window.addEventListener('blur', function() {
                 appOpened = true;
-                if (timeoutId) clearTimeout(timeoutId);
-                // La app se abrió, no mostramos nada
+                if (redirectTimeout) clearTimeout(redirectTimeout);
+                statusDiv.textContent = 'Abriendo en Educare AI...';
             });
 
-            // MÉTODO 1: Intentar abrir con iframe (silencioso)
-            var iframe = document.createElement('iframe');
+            // MÉTODO 1: Redirección directa (más agresivo)
+            setTimeout(function() {
+                if (!appOpened) {
+                    window.location.href = '${deepLink}';
+                }
+            }, 10);
+
+            // MÉTODO 2: Iframe oculto como respaldo
+            const iframe = document.createElement('iframe');
             iframe.style.display = 'none';
             iframe.src = '${deepLink}';
             document.body.appendChild(iframe);
 
-            // MÉTODO 2: También intentar con location.href como respaldo
+            // MÉTODO 3: Intentar múltiples veces con diferentes delays
             setTimeout(function() {
                 if (!appOpened) {
                     window.location.href = '${deepLink}';
                 }
             }, 100);
 
-            // Si después de 2.5 segundos seguimos aquí → app no instalada
-            timeoutId = setTimeout(function() {
+            setTimeout(function() {
                 if (!appOpened) {
-                    showDownloadButton();
+                    window.location.href = '${deepLink}';
                 }
-            }, 2500);
+            }, 300);
 
-            // Si el usuario vuelve a la página (falló la apertura)
+            // Si después de 2 segundos no se abrió la app, mostrar descarga
+            redirectTimeout = setTimeout(showDownloadButton, 2000);
+
+            // Si el usuario regresa a la página (falló la apertura)
             window.addEventListener('pageshow', function(event) {
                 if (event.persisted && !appOpened) {
                     showDownloadButton();
@@ -153,7 +161,10 @@ exports.handler = async function(event) {
 
     return {
         statusCode: 200,
-        headers: { "Content-Type": "text/html" },
+        headers: { 
+            "Content-Type": "text/html",
+            "Cache-Control": "no-cache, no-store, must-revalidate"
+        },
         body: html
     };
 };
