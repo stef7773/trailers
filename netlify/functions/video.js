@@ -13,7 +13,9 @@ exports.handler = async function(event) {
     const desc      = "Toca para ver el video en la app Educare AI";
     const url       = `https://relaxed-seahorse-65460e.netlify.app/video?id=${videoId}`;
     const playStore = `https://play.google.com/store/apps/details?id=com.educareai.app&hl=es_419`;
-    const intentUrl = `intent://video?id=${videoId}#Intent;scheme=https;host=relaxed-seahorse-65460e.netlify.app;package=com.educareai.app;S.browser_fallback_url=${encodeURIComponent(playStore)};end`;
+    
+    // Usar el deep link NORMAL (https) en lugar de intent://
+    const deepLink = url;
 
     const html = `<!DOCTYPE html>
 <html>
@@ -102,7 +104,7 @@ exports.handler = async function(event) {
     <img src="${thumb}" alt="thumbnail">
     <p>${desc}</p>
     <div class="botones">
-        <a class="btn btn-app" id="btnApp" href="${intentUrl}">
+        <a class="btn btn-app" id="btnApp" href="${deepLink}">
             🎬 Abrir en Educare AI
         </a>
         <a class="btn btn-store" href="${playStore}">
@@ -111,9 +113,11 @@ exports.handler = async function(event) {
     </div>
     <div class="debug" id="debugInfo">
         Estado: Iniciando...<br>
+        Deep Link: ${deepLink}<br>
     </div>
     <script>
         var debugDiv = document.getElementById('debugInfo');
+        var btnApp = document.getElementById('btnApp');
         
         function log(msg) {
             debugDiv.innerHTML += msg + '<br>';
@@ -121,11 +125,11 @@ exports.handler = async function(event) {
         }
         
         log('Script iniciado - Video ID: ${videoId}');
-        log('Intentando abrir app automáticamente...');
-        log('Intent URL: ${intentUrl}');
+        log('Deep Link URL: ${deepLink}');
         
-        // Intentar abrir la app automáticamente
-        window.location.href = "${intentUrl}";
+        // Intentar abrir la app automáticamente con el deep link
+        log('Intentando abrir app automáticamente...');
+        window.location.href = "${deepLink}";
         log('Redirección ejecutada');
         
         // Detectar si la app se abrió
@@ -152,17 +156,16 @@ exports.handler = async function(event) {
             }
         });
         
-        // Timeout solo para informar, sin ocultar botones
+        // Timeout solo para informar
         setTimeout(function() {
             if (appOpened) {
                 log('✅ Verificación: App abierta correctamente');
             } else {
-                log('⚠️ Verificación: No se detectó apertura (probablemente app no instalada)');
-                log('💡 El usuario debe tocar el botón rojo manualmente');
+                log('⚠️ Verificación: No se detectó apertura');
+                log('💡 El usuario debe tocar el botón ROJO manualmente');
             }
-            log('🔴 Botón ROJO: Abrir en Educare AI');
-            log('🟢 Botón VERDE: Descargar Educare AI');
-            log('✅ Ambos botones permanecen VISIBLES');
+            log('🔴 Botón ROJO: ${deepLink}');
+            log('🟢 Botón VERDE: ${playStore}');
         }, 3000);
     </script>
 </body>
