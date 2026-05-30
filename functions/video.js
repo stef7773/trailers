@@ -1,26 +1,16 @@
-/**
- * Cloudflare Pages Function: /video
- * Sirve el HTML con Open Graph correcto para que WhatsApp muestre
- * el thumbnail del tráiler al pegar el link.
- *
- * Ruta del archivo: functions/video.js
- * URL que maneja: https://trailers-cql.pages.dev/video?id=XXX
- */
-
 export async function onRequest(context) {
   const url = new URL(context.request.url);
   const videoId = url.searchParams.get('id') || '';
 
   const thumbUrl = videoId
     ? `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`
-    : 'https://trailers-cql.pages.dev/og-default.jpg';
+    : '';
 
   const title = videoId
     ? 'Mira este tráiler 🎬 — Educare AI'
     : 'Educare AI Trailers';
 
   const description = 'Ábrelo en la app y míralo sin anuncios 🚀';
-
   const pageUrl = `https://trailers-cql.pages.dev/video?id=${videoId}`;
 
   const html = `<!DOCTYPE html>
@@ -29,33 +19,129 @@ export async function onRequest(context) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
-
-  <!-- Open Graph para WhatsApp / Telegram / Twitter -->
-  <meta property="og:type"        content="video.other" />
-  <meta property="og:site_name"   content="EduCare AI Trailers" />
-  <meta property="og:title"       content="${title}" />
+  <meta property="og:type" content="video.other" />
+  <meta property="og:site_name" content="EduCare AI Trailers" />
+  <meta property="og:title" content="${title}" />
   <meta property="og:description" content="${description}" />
-  <meta property="og:image"       content="${thumbUrl}" />
-  <meta property="og:image:width"  content="1280" />
+  <meta property="og:image" content="${thumbUrl}" />
+  <meta property="og:image:width" content="1280" />
   <meta property="og:image:height" content="720" />
-  <meta property="og:url"         content="${pageUrl}" />
-
-  <meta name="twitter:card"        content="summary_large_image" />
-  <meta name="twitter:title"       content="${title}" />
+  <meta property="og:url" content="${pageUrl}" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="${title}" />
   <meta name="twitter:description" content="${description}" />
-  <meta name="twitter:image"       content="${thumbUrl}" />
-
-  <!-- Redirigir al index.html que tiene toda la lógica JS -->
-  <meta http-equiv="refresh" content="0; url=${pageUrl}" />
-  <script>window.location.replace("${pageUrl}");</script>
+  <meta name="twitter:image" content="${thumbUrl}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #090909; --surface: #111; --accent: #e50914;
+      --text: #f0f0f0; --muted: #888; --radius: 14px;
+    }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+    body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100svh; padding: 24px 16px 40px; position: relative; }
+    body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(229,9,20,0.18) 0%, transparent 70%); pointer-events: none; z-index: 0; }
+    .card { position: relative; z-index: 1; width: 100%; max-width: 420px; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05); animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
+    @keyframes slideUp { from { opacity:0; transform:translateY(30px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+    .thumb-wrap { position: relative; width: 100%; aspect-ratio: 16/9; background: #1a1a1a; overflow: hidden; }
+    .thumb-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .play-overlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; background: linear-gradient(to bottom, rgba(0,0,0,0.1) 0%, rgba(0,0,0,0.5) 100%); }
+    .play-circle { width: 64px; height: 64px; background: rgba(229,9,20,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(229,9,20,0.2); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 8px rgba(229,9,20,0.2);} 50%{box-shadow:0 0 0 16px rgba(229,9,20,0.06);} }
+    .play-circle svg { margin-left: 4px; }
+    .badge { position: absolute; top: 10px; right: 10px; background: rgba(229,9,20,0.95); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; }
+    .content { padding: 20px 20px 24px; }
+    .app-label { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .app-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: blink 1.8s infinite; }
+    @keyframes blink { 0%,100%{opacity:1;} 50%{opacity:0.3;} }
+    .app-label span { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+    h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,6vw,30px); line-height: 1.1; color: var(--text); margin-bottom: 6px; letter-spacing: 0.02em; }
+    .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.4; }
+    .btn-open { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, var(--accent), #b50710); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(229,9,20,0.4); margin-bottom: 10px; transition: transform 0.15s ease; }
+    .btn-open:active { transform: scale(0.97); }
+    .btn-download { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; border-radius: 10px; cursor: pointer; text-decoration: none; }
+    #state-has-app, #state-no-app { display: none; }
+    .loading-text { text-align: center; font-size: 13px; color: var(--muted); padding: 8px 0; }
+    .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 16px 0; }
+    .footer { position: relative; z-index: 1; margin-top: 20px; text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
+    .footer strong { color: rgba(255,255,255,0.35); font-weight: 600; }
+  </style>
 </head>
-<body></body>
+<body>
+  <div class="card">
+    ${videoId ? `
+    <div class="thumb-wrap">
+      <img id="thumb" src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg"
+           onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'" alt="Thumbnail" />
+      <div class="play-overlay">
+        <div class="play-circle">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+        </div>
+      </div>
+      <div class="badge">SIN ANUNCIOS</div>
+    </div>` : ''}
+    <div class="content">
+      <div class="app-label"><div class="app-dot"></div><span>EduCare AI Trailers</span></div>
+      <h1>Tráiler de Cine 🎬</h1>
+      <p class="subtitle">Ábrelo en la app y míralo sin anuncios ni interrupciones</p>
+      <div id="state-loading" class="loading-text">Abriendo la app…</div>
+      <div id="state-has-app">
+        <a class="btn-open" id="btn-app1" href="${pageUrl}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+          Ver en la app
+        </a>
+      </div>
+      <div id="state-no-app">
+        <a class="btn-open" id="btn-app2" href="${pageUrl}">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+          Ver en la app
+        </a>
+        <div class="divider"></div>
+        <a class="btn-download" href="https://play.google.com/store/apps/details?id=com.educareai.app" target="_blank">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
+          Descargar EduCare AI (gratis)
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="footer"><strong>EDUCARE AI</strong> · Trailers sin anuncios</div>
+
+  <script>
+    var videoId = '${videoId}';
+    var appScheme = 'educare://video?id=' + videoId;
+
+    var appOpened = false;
+    var onBlur = function() { appOpened = true; };
+    window.addEventListener('blur', onBlur, { once: true });
+    window.addEventListener('pagehide', onBlur, { once: true });
+
+    // Intentar abrir la app via esquema custom (NO via https para evitar loop)
+    if (videoId) {
+      setTimeout(function() {
+        window.location.href = appScheme;
+      }, 100);
+    }
+
+    setTimeout(function() {
+      window.removeEventListener('blur', onBlur);
+      window.removeEventListener('pagehide', onBlur);
+      document.getElementById('state-loading').style.display = 'none';
+      if (appOpened) {
+        document.getElementById('state-has-app').style.display = 'block';
+      } else {
+        document.getElementById('state-no-app').style.display = 'block';
+      }
+    }, 1500);
+  </script>
+</body>
 </html>`;
 
   return new Response(html, {
     headers: {
       'Content-Type': 'text/html;charset=UTF-8',
-      'Cache-Control': 'public, max-age=3600',
+      'Cache-Control': 'no-cache',
     },
   });
 }
