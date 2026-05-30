@@ -7,30 +7,22 @@ export async function onRequest(context) {
     : '';
 
   const title = videoId
-    ? 'Mira este tráiler 🎬 — Educare AI'
+    ? 'Educare AI Trailers 🎬'
     : 'Educare AI Trailers';
 
-  const description = 'Ábrelo en la app y míralo sin anuncios 🚀';
-  const pageUrl = `https://trailers-cql.pages.dev/video?id=${videoId}`;
-
   const html = `<!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
   <meta property="og:type" content="video.other" />
-  <meta property="og:site_name" content="EduCare AI Trailers" />
+  <meta property="og:site_name" content="Educare AI Trailers" />
   <meta property="og:title" content="${title}" />
-  <meta property="og:description" content="${description}" />
+  <meta property="og:description" content="Watch on Educare AI app" />
   <meta property="og:image" content="${thumbUrl}" />
-  <meta property="og:image:width" content="1280" />
-  <meta property="og:image:height" content="720" />
-  <meta property="og:url" content="${pageUrl}" />
+  <meta property="og:url" content="https://trailers-cql.pages.dev/video?id=${videoId}" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="${title}" />
-  <meta name="twitter:description" content="${description}" />
-  <meta name="twitter:image" content="${thumbUrl}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -40,7 +32,7 @@ export async function onRequest(context) {
       --bg: #090909; --surface: #111; --accent: #e50914;
       --text: #f0f0f0; --muted: #888; --radius: 14px;
     }
-    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; overflow-x: hidden; }
+    html, body { height: 100%; background: var(--bg); color: var(--text); font-family: 'DM Sans', sans-serif; }
     body { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100svh; padding: 24px 16px 40px; position: relative; }
     body::before { content: ''; position: fixed; inset: 0; background: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(229,9,20,0.18) 0%, transparent 70%); pointer-events: none; z-index: 0; }
     .card { position: relative; z-index: 1; width: 100%; max-width: 420px; background: var(--surface); border-radius: var(--radius); overflow: hidden; box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.05); animation: slideUp 0.5s cubic-bezier(0.22,1,0.36,1) both; }
@@ -63,71 +55,85 @@ export async function onRequest(context) {
     .btn-open:active { transform: scale(0.97); }
     .btn-download { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(22,163,74,0.4); transition: transform 0.15s ease; }
     .btn-download:active { transform: scale(0.97); }
-    #state-has-app, #state-no-app { display: none; }
-    .loading-text { text-align: center; font-size: 13px; color: var(--muted); padding: 8px 0; }
     .footer { position: relative; z-index: 1; margin-top: 20px; text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
     .footer strong { color: rgba(255,255,255,0.35); font-weight: 600; }
+    .message { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
   </style>
 </head>
 <body>
   <div class="card">
     ${videoId ? `
     <div class="thumb-wrap">
-      <img id="thumb" src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg"
+      <img src="https://img.youtube.com/vi/${videoId}/maxresdefault.jpg"
            onerror="this.src='https://img.youtube.com/vi/${videoId}/hqdefault.jpg'" alt="Thumbnail" />
       <div class="play-overlay">
         <div class="play-circle">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
         </div>
       </div>
-      <div class="badge">SIN ANUNCIOS</div>
+      <div class="badge">NO ADS</div>
     </div>` : ''}
     <div class="content">
-      <div class="app-label"><div class="app-dot"></div><span>EduCare AI Trailers</span></div>
-      <h1>Tráiler de Cine 🎬</h1>
-      <p class="subtitle">Ábrelo en la app y míralo sin anuncios ni interrupciones</p>
-      <div id="state-loading" class="loading-text">Abriendo la app…</div>
-      <div id="state-has-app">
-        <a class="btn-open" id="btn-app1" href="${pageUrl}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
-          Ver en la app
-        </a>
-      </div>
-      <div id="state-no-app">
-        <a class="btn-download" href="https://play.google.com/store/apps/details?id=com.educareai.app" target="_blank">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
-          Descargar EduCare AI (gratis)
-        </a>
-      </div>
+      <div class="app-label"><div class="app-dot"></div><span>EDUCARE AI</span></div>
+      <h1>${videoId ? 'Watch Trailer' : 'Trailers'}</h1>
+      <p class="subtitle">${videoId ? 'Open in app · No ads' : 'No ads · Better quality'}</p>
+      
+      <a class="btn-open" id="openBtn" href="#">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
+        Open in App
+      </a>
+      
+      <a class="btn-download" id="downloadBtn" href="https://play.google.com/store/apps/details?id=com.educareai.app" target="_blank">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
+        Download
+      </a>
+      
+      <div class="message" id="msg">✨ Open in Educare AI for better experience</div>
     </div>
   </div>
-  <div class="footer"><strong>EDUCARE AI</strong> · Trailers sin anuncios</div>
+  <div class="footer"><strong>EDUCARE AI</strong> · Trailers without ads</div>
 
   <script>
     var videoId = '${videoId}';
     var appScheme = 'educare://video?id=' + videoId;
-
-    var appOpened = false;
-    var onBlur = function() { appOpened = true; };
-    window.addEventListener('blur', onBlur, { once: true });
-    window.addEventListener('pagehide', onBlur, { once: true });
-
-    if (videoId) {
-      setTimeout(function() {
-        window.location.href = appScheme;
-      }, 100);
+    var fallbackUrl = 'https://play.google.com/store/apps/details?id=com.educareai.app';
+    
+    var openBtn = document.getElementById('openBtn');
+    var downloadBtn = document.getElementById('downloadBtn');
+    var msg = document.getElementById('msg');
+    
+    var openTimeout;
+    var hasOpened = false;
+    
+    function tryOpenApp() {
+      if (hasOpened) return;
+      hasOpened = true;
+      
+      window.location.href = appScheme;
+      
+      openTimeout = setTimeout(function() {
+        msg.innerHTML = "⬇️ Don't have the app? Tap Download below ⬇️";
+        msg.style.color = '#16a34a';
+      }, 800);
     }
-
-    setTimeout(function() {
-      window.removeEventListener('blur', onBlur);
-      window.removeEventListener('pagehide', onBlur);
-      document.getElementById('state-loading').style.display = 'none';
-      if (appOpened) {
-        document.getElementById('state-has-app').style.display = 'block';
-      } else {
-        document.getElementById('state-no-app').style.display = 'block';
-      }
-    }, 1500);
+    
+    function onPageHide() {
+      clearTimeout(openTimeout);
+      msg.innerHTML = "✓ Opening app...";
+    }
+    
+    openBtn.onclick = function(e) {
+      e.preventDefault();
+      tryOpenApp();
+      return false;
+    };
+    
+    window.addEventListener('pagehide', onPageHide);
+    window.addEventListener('blur', onPageHide);
+    
+    if (videoId) {
+      setTimeout(tryOpenApp, 50);
+    }
   </script>
 </body>
 </html>`;
