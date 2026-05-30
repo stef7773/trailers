@@ -61,10 +61,10 @@ export async function onRequest(context) {
     .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.4; }
     .btn-open { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, var(--accent), #b50710); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(229,9,20,0.4); margin-bottom: 10px; transition: transform 0.15s ease; }
     .btn-open:active { transform: scale(0.97); }
-    .btn-download { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 13px 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text); font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 500; border-radius: 10px; cursor: pointer; text-decoration: none; }
+    .btn-download { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(22,163,74,0.4); transition: transform 0.15s ease; }
+    .btn-download:active { transform: scale(0.97); }
     #state-has-app, #state-no-app { display: none; }
     .loading-text { text-align: center; font-size: 13px; color: var(--muted); padding: 8px 0; }
-    .divider { height: 1px; background: rgba(255,255,255,0.07); margin: 16px 0; }
     .footer { position: relative; z-index: 1; margin-top: 20px; text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
     .footer strong { color: rgba(255,255,255,0.35); font-weight: 600; }
   </style>
@@ -94,11 +94,6 @@ export async function onRequest(context) {
         </a>
       </div>
       <div id="state-no-app">
-        <a class="btn-open" id="btn-app2" href="${pageUrl}">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
-          Ver en la app
-        </a>
-        <div class="divider"></div>
         <a class="btn-download" href="https://play.google.com/store/apps/details?id=com.educareai.app" target="_blank">
           <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
           Descargar EduCare AI (gratis)
@@ -117,7 +112,6 @@ export async function onRequest(context) {
     window.addEventListener('blur', onBlur, { once: true });
     window.addEventListener('pagehide', onBlur, { once: true });
 
-    // Intentar abrir la app via esquema custom (NO via https para evitar loop)
     if (videoId) {
       setTimeout(function() {
         window.location.href = appScheme;
