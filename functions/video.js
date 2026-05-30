@@ -49,8 +49,6 @@ export async function onRequest(context) {
     .app-label span { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
     h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,6vw,30px); line-height: 1.1; color: var(--text); margin-bottom: 6px; letter-spacing: 0.02em; }
     .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.4; }
-    .btn-open { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, var(--accent), #b50710); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(229,9,20,0.4); margin-bottom: 10px; transition: transform 0.15s ease; }
-    .btn-open:active { transform: scale(0.97); }
     .btn-download { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(22,163,74,0.4); transition: transform 0.15s ease; }
     .btn-download:active { transform: scale(0.97); }
     .message { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
@@ -73,61 +71,19 @@ export async function onRequest(context) {
       <h1>${videoId ? 'Watch Trailer' : 'Trailers'}</h1>
       <p class="subtitle">${videoId ? 'Open in app' : 'Better quality'}</p>
       
-      <a class="btn-open" id="openBtn" href="#">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
-        Open in App
-      </a>
-      
       <a class="btn-download" id="downloadBtn" href="https://play.google.com/store/apps/details?id=com.educareai.app" target="_blank">
         <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
         Download
       </a>
       
-      <div class="message" id="msg">✨ Open in Educare AI for better experience</div>
+      <div class="message" id="msg">✨ Download Educare AI for better experience</div>
     </div>
   </div>
 
   <script>
     var videoId = '${videoId}';
-    var appScheme = 'educare://video?id=' + videoId;
-    var fallbackUrl = 'https://play.google.com/store/apps/details?id=com.educareai.app';
-    
-    var openBtn = document.getElementById('openBtn');
     var downloadBtn = document.getElementById('downloadBtn');
     var msg = document.getElementById('msg');
-    
-    var openTimeout;
-    var hasOpened = false;
-    
-    function tryOpenApp() {
-      if (hasOpened) return;
-      hasOpened = true;
-      
-      window.location.href = appScheme;
-      
-      openTimeout = setTimeout(function() {
-        msg.innerHTML = "⬇️ Don't have the app? Tap Download below ⬇️";
-        msg.style.color = '#16a34a';
-      }, 800);
-    }
-    
-    function onPageHide() {
-      clearTimeout(openTimeout);
-      msg.innerHTML = "✓ Opening app...";
-    }
-    
-    openBtn.onclick = function(e) {
-      e.preventDefault();
-      tryOpenApp();
-      return false;
-    };
-    
-    window.addEventListener('pagehide', onPageHide);
-    window.addEventListener('blur', onPageHide);
-    
-    if (videoId) {
-      setTimeout(tryOpenApp, 50);
-    }
   </script>
 </body>
 </html>`;
