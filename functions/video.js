@@ -11,15 +11,15 @@ export async function onRequest(context) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Educare AI</title>
+  <title>Educare AI Trailer</title>
   <meta property="og:type" content="video.other" />
   <meta property="og:site_name" content="Educare AI" />
-  <meta property="og:title" content=" " />
+  <meta property="og:title" content="Educare AI Trailer" />
   <meta property="og:description" content=" " />
   <meta property="og:image" content="${thumbUrl}" />
   <meta property="og:url" content="https://trailers-cql.pages.dev/video?id=${videoId}" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content=" " />
+  <meta name="twitter:title" content="Educare AI Trailer" />
   <meta name="twitter:description" content=" " />
   <meta name="twitter:image" content="${thumbUrl}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -42,7 +42,6 @@ export async function onRequest(context) {
     .play-circle { width: 64px; height: 64px; background: rgba(229,9,20,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 8px rgba(229,9,20,0.2); animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{box-shadow:0 0 0 8px rgba(229,9,20,0.2);} 50%{box-shadow:0 0 0 16px rgba(229,9,20,0.06);} }
     .play-circle svg { margin-left: 4px; }
-    .badge { position: absolute; top: 10px; right: 10px; background: rgba(229,9,20,0.95); color: #fff; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; padding: 4px 8px; border-radius: 4px; }
     .content { padding: 20px 20px 24px; }
     .app-label { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
     .app-dot { width: 8px; height: 8px; background: var(--accent); border-radius: 50%; animation: blink 1.8s infinite; }
@@ -54,8 +53,6 @@ export async function onRequest(context) {
     .btn-open:active { transform: scale(0.97); }
     .btn-download { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(22,163,74,0.4); transition: transform 0.15s ease; }
     .btn-download:active { transform: scale(0.97); }
-    .footer { position: relative; z-index: 1; margin-top: 20px; text-align: center; font-size: 11px; color: var(--muted); letter-spacing: 0.04em; }
-    .footer strong { color: rgba(255,255,255,0.35); font-weight: 600; }
     .message { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
   </style>
 </head>
@@ -70,12 +67,11 @@ export async function onRequest(context) {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
         </div>
       </div>
-      <div class="badge">NO ADS</div>
     </div>` : ''}
     <div class="content">
       <div class="app-label"><div class="app-dot"></div><span>EDUCARE AI</span></div>
       <h1>${videoId ? 'Watch Trailer' : 'Trailers'}</h1>
-      <p class="subtitle">${videoId ? 'Open in app · No ads' : 'No ads · Better quality'}</p>
+      <p class="subtitle">${videoId ? 'Open in app' : 'Better quality'}</p>
       
       <a class="btn-open" id="openBtn" href="#">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5,3 19,12 5,21"/></svg>
@@ -90,7 +86,6 @@ export async function onRequest(context) {
       <div class="message" id="msg">✨ Open in Educare AI for better experience</div>
     </div>
   </div>
-  <div class="footer"><strong>EDUCARE AI</strong> · Trailers without ads</div>
 
   <script>
     var videoId = '${videoId}';
