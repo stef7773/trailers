@@ -1,4 +1,3 @@
-
 [
   {
     "relation": [
@@ -9,7 +8,7 @@
       "namespace": "android_app",
       "package_name": "com.educareai.app",
       "sha256_cert_fingerprints": [
-        "4F:F7:8D:4F:85:C1:E5:24:78:5D:0C:AF:18:6C:3F:29:84:1D:FF:E6:FD:F4:2F:51:0D:B0:00:C5:0C:A0:EE:96"
+        "82:98:1B:E3:AA:41:C1:A2:1C:ED:3E:BF:DB:11:DA:EF:D0:53:44:5D:F8:B8:29:8A:4D:6D:47:0F:DE:3B:B2:B5"
       ]
     }
   }
