@@ -11,15 +11,15 @@ export async function onRequest(context) {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Educare AI 🎬</title>
+  <title>Educare AI</title>
   <meta property="og:type" content="video.other" />
   <meta property="og:site_name" content="Educare AI" />
-  <meta property="og:title" content="Educare AI" />
+  <meta property="og:title" content=" " />
   <meta property="og:description" content=" " />
   <meta property="og:image" content="${thumbUrl}" />
   <meta property="og:url" content="https://trailers-cql.pages.dev/video?id=${videoId}" />
   <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content="Educare AI" />
+  <meta name="twitter:title" content=" " />
   <meta name="twitter:description" content=" " />
   <meta name="twitter:image" content="${thumbUrl}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
