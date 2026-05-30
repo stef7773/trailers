@@ -1,3 +1,4 @@
+
 [
   {
     "relation": [
@@ -8,9 +9,7 @@
       "namespace": "android_app",
       "package_name": "com.educareai.app",
       "sha256_cert_fingerprints": [
-        "84:1E:76:3C:3F:9A:D1:6B:B8:54:9C:47:AE:A9:31:2B:00:34:91:92:D4:14:83:2B:A3:C4:4E:55:18:CE:3A:C4",
-        "84:1E:76:3C:3F:9A:D1:6B:B8:54:97:B0:BC:1E:F7:1E:8A:71:3A:E0:46:D4:43:A1",
-        "82:98:1B:E3:AA:41:C1:A2:1C:ED:3E:BF:DB:11:DA:EF:D0:53:44:5D:F8:B8:29:8A:4D:6D:47:0F:DE:3B:B2:B5"
+        "4F:F7:8D:4F:85:C1:E5:24:78:5D:0C:AF:18:6C:3F:29:84:1D:FF:E6:FD:F4:2F:51:0D:B0:00:C5:0C:A0:EE:96"
       ]
     }
   }
