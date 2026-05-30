@@ -7,8 +7,8 @@ export async function onRequest(context) {
     : '';
 
   const title = videoId
-    ? 'Educare AI Trailers 🎬'
-    : 'Educare AI Trailers';
+    ? 'Educare AI 🎬'
+    : 'Educare AI 🎬';
 
   const html = `<!DOCTYPE html>
 <html lang="en">
@@ -17,12 +17,15 @@ export async function onRequest(context) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${title}</title>
   <meta property="og:type" content="video.other" />
-  <meta property="og:site_name" content="Educare AI Trailers" />
-  <meta property="og:title" content="${title}" />
-  <meta property="og:description" content="Watch on Educare AI app" />
+  <meta property="og:site_name" content="Educare AI" />
+  <meta property="og:title" content="Educare AI 🎬" />
+  <meta property="og:description" content=" " />
   <meta property="og:image" content="${thumbUrl}" />
   <meta property="og:url" content="https://trailers-cql.pages.dev/video?id=${videoId}" />
   <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Educare AI 🎬" />
+  <meta name="twitter:description" content=" " />
+  <meta name="twitter:image" content="${thumbUrl}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
