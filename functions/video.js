@@ -49,9 +49,13 @@ export async function onRequest(context) {
     .app-label span { font-size: 11px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
     h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px,6vw,30px); line-height: 1.1; color: var(--text); margin-bottom: 6px; letter-spacing: 0.02em; }
     .subtitle { font-size: 13px; color: var(--muted); margin-bottom: 22px; line-height: 1.4; }
+    .btn-open { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #e50914, #b0060f); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(229,9,20,0.4); transition: transform 0.15s ease; margin-bottom: 12px; }
+    .btn-open:active { transform: scale(0.97); }
     .btn-download { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 15px 20px; background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; border: none; border-radius: 10px; cursor: pointer; text-decoration: none; box-shadow: 0 4px 20px rgba(22,163,74,0.4); transition: transform 0.15s ease; }
     .btn-download:active { transform: scale(0.97); }
     .message { text-align: center; font-size: 12px; color: var(--muted); margin-top: 12px; }
+    /* Botón abrir oculto por defecto, se muestra si app no abre */
+    #openBtn { display: none; }
   </style>
 </head>
 <body>
@@ -68,22 +72,103 @@ export async function onRequest(context) {
     </div>` : ''}
     <div class="content">
       <div class="app-label"><div class="app-dot"></div><span>EDUCARE AI</span></div>
-      <h1>${videoId ? 'Watch Trailer' : 'Trailers'}</h1>
-      <p class="subtitle">${videoId ? 'Open in app' : 'Better quality'}</p>
-      
-      <a class="btn-download" id="downloadBtn" href="https://play.google.com/store/apps/details?id=com.educareai.app" target="_blank">
-        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
-        Download
+      <h1>${videoId ? 'Mira este tráiler 🎬' : 'Trailers'}</h1>
+      <p class="subtitle" id="subtitle">${videoId ? 'Abriendo en Educare AI...' : 'Mejor calidad en la app'}</p>
+
+      <!-- Botón abrir app: visible solo si el deep link falló -->
+      <a class="btn-open" id="openBtn"
+         href="https://trailers-cql.pages.dev/video?id=${videoId}">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="white"><polygon points="6,3 20,12 6,21"/></svg>
+        🎬 Abrir en Educare AI
       </a>
-      
-      <div class="message" id="msg">✨ Download Educare AI for better experience</div>
+
+      <!-- Botón descargar: visible solo si app no está instalada -->
+      <a class="btn-download" id="downloadBtn"
+         href="https://play.google.com/store/apps/details?id=com.educareai.app"
+         style="display:none">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3M8 11l4 4 4-4"/><path d="M3 17v2a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-2"/></svg>
+        Descargar Educare AI
+      </a>
+
+      <div class="message" id="msg">Toca para ver el video en la app Educare AI</div>
     </div>
   </div>
 
   <script>
     var videoId = '${videoId}';
+    var openBtn   = document.getElementById('openBtn');
     var downloadBtn = document.getElementById('downloadBtn');
-    var msg = document.getElementById('msg');
+    var subtitle  = document.getElementById('subtitle');
+    var msg       = document.getElementById('msg');
+
+    if (!videoId) {
+      // Sin video ID — solo mostrar botón de descarga
+      downloadBtn.style.display = 'flex';
+      subtitle.textContent = 'Descarga la app para ver tráilers';
+      msg.textContent = '';
+    } else {
+      // ── Intento 1: Android App Links (abre directamente si está verificado) ──
+      // La URL HTTPS del dominio verificado hace que Android abra la app directo
+      // sin necesidad de intent:// — gracias a que trailers-cql.pages.dev: verified
+
+      // Guardamos el momento antes de intentar abrir
+      var start = Date.now();
+      var appOpened = false;
+
+      // Listener: si la página pierde foco, la app se abrió
+      var onBlur = function() {
+        appOpened = true;
+      };
+      window.addEventListener('blur', onBlur);
+      document.addEventListener('visibilitychange', function() {
+        if (document.hidden) appOpened = true;
+      });
+
+      // ── Intento 2: intent:// como fallback ───────────────────────────────────
+      function tryIntentUrl() {
+        var intentUrl =
+          'intent://trailers-cql.pages.dev/video?id=' + videoId +
+          '#Intent;' +
+          'scheme=https;' +
+          'package=com.educareai.app;' +
+          'S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.educareai.app;' +
+          'end';
+
+        window.location.href = intentUrl;
+      }
+
+      // ── Timer: si después de 2.5s la app no abrió → mostrar botones ─────────
+      setTimeout(function() {
+        window.removeEventListener('blur', onBlur);
+
+        var elapsed = Date.now() - start;
+        var userLeft = appOpened || document.hidden || elapsed < 100;
+
+        if (!userLeft) {
+          // App no instalada o deep link falló → mostrar opciones
+          subtitle.textContent = '¿Tienes Educare AI instalada?';
+          openBtn.style.display   = 'flex';
+          downloadBtn.style.display = 'flex';
+          msg.textContent = 'Si ya tienes la app, toca "Abrir". Si no, descárgala gratis.';
+        }
+      }, 2500);
+
+      // ── Ejecutar intent inmediatamente ───────────────────────────────────────
+      tryIntentUrl();
+    }
+
+    // Botón "Abrir" manual → reintenta el intent
+    openBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      var intentUrl =
+        'intent://trailers-cql.pages.dev/video?id=' + videoId +
+        '#Intent;' +
+        'scheme=https;' +
+        'package=com.educareai.app;' +
+        'S.browser_fallback_url=https://play.google.com/store/apps/details?id=com.educareai.app;' +
+        'end';
+      window.location.href = intentUrl;
+    });
   </script>
 </body>
 </html>`;
