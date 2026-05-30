@@ -1,7 +1,10 @@
 exports.handler = async function() {
     return {
         statusCode: 200,
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*" // Buena práctica para que Google Play no tenga problemas de CORS
+        },
         body: JSON.stringify([
           {
             "relation": ["delegate_permission/common.handle_all_urls"],
